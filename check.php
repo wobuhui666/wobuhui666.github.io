@@ -1,5 +1,5 @@
 <?php
-$password = "mapiwobuhui666"; // 正确的密码
+$password = "1"; // 正确的密码
 if ($_POST["password"] == $password) {
     // 密码正确，跳转到受保护的页面
     header("Location: 6.html");
