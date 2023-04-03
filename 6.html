@@ -2,12 +2,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>适配手机的HTML代码</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>背景铺满屏幕的HTML代码</title>
 	<style>
 		body {
 			background: linear-gradient(to bottom, #ffcccc, #3333cc);
-			font-size: 16px;
+			background-size: cover;
+			background-position: center center;
 		}
 		h1 {
 			text-align: center;
@@ -20,17 +20,6 @@
 			line-height: 1.5;
 			margin-top: 0.5em;
 			margin-bottom: 0.5em;
-		}
-		@media screen and (max-width: 480px) {
-			body {
-				font-size: 14px;
-			}
-			h1 {
-				font-size: 1.5em;
-			}
-			p {
-				font-size: 1em;
-			}
 		}
 	</style>
 </head>
