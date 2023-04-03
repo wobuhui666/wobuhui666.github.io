@@ -1,12 +1,36 @@
 <div class="code">
-<div class="code">
 <!DOCTYPE html>
 <html>
 <head>
-	<title>显示文本的HTML代码</title>
+	<title>适配手机的HTML代码</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		body {
 			background: linear-gradient(to bottom, #ffcccc, #3333cc);
+			font-size: 16px;
+		}
+		h1 {
+			text-align: center;
+			font-size: 2em;
+			margin-top: 0.5em;
+			margin-bottom: 0.5em;
+		}
+		p {
+			text-align: justify;
+			line-height: 1.5;
+			margin-top: 0.5em;
+			margin-bottom: 0.5em;
+		}
+		@media screen and (max-width: 480px) {
+			body {
+				font-size: 14px;
+			}
+			h1 {
+				font-size: 1.5em;
+			}
+			p {
+				font-size: 1em;
+			}
 		}
 	</style>
 </head>
@@ -15,5 +39,4 @@
 	<p>这是一个显示文本的段落。</p>
 </body>
 </html>
-</div>
 </div>
