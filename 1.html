@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mary</title>
+</head>
+<body>
+
+  <h1>Mary</h1>
+  
+  <img id="myImage" src="image1.jpg" style="width:300px;height:200px;">
+  
+  <button onclick="changeImage()">点这里</button>
+  
+  <script>
+    var imageIndex = 1;
+    function changeImage() {
+      var image = document.getElementById('myImage');
+      if (imageIndex == 1) {
+        image.src = 'https://mapi.mapi1.repl.co/d/%E9%98%BF%E9%87%8C/%E6%8A%98%E8%85%BE/2.PNG';
+        imageIndex = 2;
+      } else {
+        image.src = 'https://mapi.mapi1.repl.co/d/%E9%98%BF%E9%87%8C/%E6%8A%98%E8%85%BE/1.PNG';
+        imageIndex = 1;
+      }
+    }
+  </script>
+
+</body>
+</html>
+```
