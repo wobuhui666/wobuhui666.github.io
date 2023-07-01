@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -31,6 +30,7 @@
             bottom: 10px;
             right: 10px;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
         }
@@ -54,19 +54,66 @@
         <div class="control-button" id="up-button">↑</div>
         <div>
             <div class="control-button" id="left-button">←</div>
+            <div class="control-button" id="down-button">↓</div>
             <div class="control-button" id="right-button">→</div>
         </div>
-        <div class="control-button" id="down-button">↓</div>
     </div>
 
     <script>
-        var gameBoard = document.getElementById("game-board");
-        var snake = [{ top: 0, left: 0 }];
-        var food = { top: 100, left: 100 };
+        var snake = [{ top: 200, left: 200 }];
+        var food = {};
         var direction = "right";
         var interval;
 
-        function createSnake() {
+        function init() {
+            generateFood();
+            interval = setInterval(moveSnake, 100);
+        }
+
+        function generateFood() {
+            var randomTop = Math.floor(Math.random() * 20) * 20;
+            var randomLeft = Math.floor(Math.random() * 20) * 20;
+
+            food = { top: randomTop, left: randomLeft };
+
+            var foodElement = document.createElement("div");
+            foodElement.className = "food";
+            foodElement.style.top = food.top + "px";
+            foodElement.style.left = food.left + "px";
+
+            var gameBoard = document.getElementById("game-board");
+            gameBoard.appendChild(foodElement);
+        }
+
+        function moveSnake() {
+            var head = Object.assign({}, snake[0]);
+
+            if (direction === "up") {
+                head.top -= 20;
+            } else if (direction === "down") {
+                head.top += 20;
+            } else if (direction === "left") {
+                head.left -= 20;
+            } else if (direction === "right") {
+                head.left += 20;
+            }
+
+            snake.unshift(head);
+
+            if (head.top === food.top && head.left === food.left) {
+                generateFood();
+            } else {
+                snake.pop();
+            }
+
+            renderSnake();
+            checkCollision();
+        }
+
+        function renderSnake() {
+            var gameBoard = document.getElementById("game-board");
+            gameBoard.innerHTML = "";
+
             for (var i = 0; i < snake.length; i++) {
                 var snakeElement = document.createElement("div");
                 snakeElement.className = "snake";
@@ -76,35 +123,8 @@
             }
         }
 
-        function createFood() {
-            var foodElement = document.createElement("div");
-            foodElement.className = "food";
-            foodElement.style.top = food.top + "px";
-            foodElement.style.left = food.left + "px";
-            gameBoard.appendChild(foodElement);
-        }
-
-        function moveSnake() {
-            var head = { top: snake[0].top, left: snake[0].left };
-
-            if (direction === "right") {
-                head.left += 20;
-            } else if (direction === "left") {
-                head.left -= 20;
-            } else if (direction === "up") {
-                head.top -= 20;
-            } else if (direction === "down") {
-                head.top += 20;
-            }
-
-            snake.unshift(head);
-            snake.pop();
-
-            for (var i = 0; i < snake.length; i++) {
-                var snakeElement = document.getElementsByClassName("snake")[i];
-                snakeElement.style.top = snake[i].top + "px";
-                snakeElement.style.left = snake[i].left + "px";
-            }
+        function changeDirection(newDirection) {
+            direction = newDirection;
         }
 
         function checkCollision() {
@@ -121,97 +141,25 @@
                     alert("Game Over!");
                 }
             }
-
-            if (head.top === food.top && head.left === food.left) {
-                snake.push({});
-                generateFood();
-            }
         }
 
-        function generateFood() {
-            var randomTop = Math.floor(Math.random() * 20) * 20;
-            var randomLeft = Math.floor(Math.random() * 20) * 20;
+        document.getElementById("up-button").addEventListener("click", function() {
+            changeDirection("up");
+        });
 
-            for (var i = 0; i < snake.length; i++) {
-                if (randomTop === snake[i].top && randomLeft === snake[i].left) {
-                    generateFood();
-                    return;
-                }
-            }
+        document.getElementById("left-button").addEventListener("click", function() {
+            changeDirection("left");
+        });
 
-            food = { top: randomTop, left: randomLeft };
-            var foodElement = document.getElementsByClassName("food")[0];
-            foodElement.style.top = food.top + "px";
-            foodElement.style.left = food.left + "px";
-        }
+        document.getElementById("down-button").addEventListener("click", function() {
+            changeDirection("down");
+        });
 
-        function changeDirection(event) {
-            if (event.keyCode === 37 && direction !== "right") {
-                direction = "left";
-            } else if (event.keyCode === 38 && direction !== "down") {
-                direction = "up";
-            } else if (event.keyCode === 39 && direction !== "left") {
-                direction = "right";
-            } else if (event.keyCode === 40 && direction !== "up") {
-                direction = "down";
-            }
-        }
+        document.getElementById("right-button").addEventListener("click", function() {
+            changeDirection("right");
+        });
 
-        function handleTouch(event) {
-            var x = event.touches[0].clientX;
-            var y = event.touches[0].clientY;
-
-            var gameBoardRect = gameBoard.getBoundingClientRect();
-            var gameBoardX = gameBoardRect.left;
-            var gameBoardY = gameBoardRect.top;
-
-            var relativeX = x - gameBoardX;
-            var relativeY = y - gameBoardY;
-
-            if (relativeX > relativeY && direction !== "down") {
-                direction = "up";
-            } else if (relativeX < relativeY && direction !== "up") {
-                direction = "down";
-            } else if (relativeX < relativeY && direction !== "right") {
-                direction = "left";
-            } else if (relativeX > relativeY && direction !== "left") {
-                direction = "right";
-            }
-        }
-
-        function startGame() {
-            createSnake();
-            createFood();
-            interval = setInterval(function () {
-                moveSnake();
-                checkCollision();
-            }, 200);
-            document.addEventListener("keydown", changeDirection);
-            gameBoard.addEventListener("touchstart", handleTouch);
-
-            var upButton = document.getElementById("up-button");
-            var downButton = document.getElementById("down-button");
-            var leftButton = document.getElementById("left-button");
-            var rightButton = document.getElementById("right-button");
-
-            upButton.addEventListener("touchstart", function () {
-                direction = "up";
-            });
-
-            downButton.addEventListener("touchstart", function () {
-                direction = "down";
-            });
-
-            leftButton.addEventListener("touchstart", function () {
-                direction = "left";
-            });
-
-            rightButton.addEventListener("touchstart", function () {
-                direction = "right";
-            });
-        }
-
-        startGame();
+        init();
     </script>
 </body>
 </html>
