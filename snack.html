@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #game-board {
+            width: 400px;
+            height: 400px;
+            border: 1px solid black;
+            position: relative;
+        }
+
+        .snake {
+            width: 20px;
+            height: 20px;
+            background-color: green;
+            position: absolute;
+        }
+
+        .food {
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            position: absolute;
+        }
+
+        #controls {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .control-button {
+            width: 30px;
+            height: 30px;
+            background-color: lightgray;
+            margin: 5px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-board"></div>
+
+    <div id="controls">
+        <div class="control-button" id="up-button">↑</div>
+        <div>
+            <div class="control-button" id="left-button">←</div>
+            <div class="control-button" id="right-button">→</div>
+        </div>
+        <div class="control-button" id="down-button">↓</div>
+    </div>
+
+    <script>
+        var gameBoard = document.getElementById("game-board");
+        var snake = [{ top: 0, left: 0 }];
+        var food = { top: 100, left: 100 };
+        var direction = "right";
+        var interval;
+
+        function createSnake() {
+            for (var i = 0; i < snake.length; i++) {
+                var snakeElement = document.createElement("div");
+                snakeElement.className = "snake";
+                snakeElement.style.top = snake[i].top + "px";
+                snakeElement.style.left = snake[i].left + "px";
+                gameBoard.appendChild(snakeElement);
+            }
+        }
+
+        function createFood() {
+            var foodElement = document.createElement("div");
+            foodElement.className = "food";
+            foodElement.style.top = food.top + "px";
+            foodElement.style.left = food.left + "px";
+            gameBoard.appendChild(foodElement);
+        }
+
+        function moveSnake() {
+            var head = { top: snake[0].top, left: snake[0].left };
+
+            if (direction === "right") {
+                head.left += 20;
+            } else if (direction === "left") {
+                head.left -= 20;
+            } else if (direction === "up") {
+                head.top -= 20;
+            } else if (direction === "down") {
+                head.top += 20;
+            }
+
+            snake.unshift(head);
+            snake.pop();
+
+            for (var i = 0; i < snake.length; i++) {
+                var snakeElement = document.getElementsByClassName("snake")[i];
+                snakeElement.style.top = snake[i].top + "px";
+                snakeElement.style.left = snake[i].left + "px";
+            }
+        }
+
+        function checkCollision() {
+            var head = snake[0];
+
+            if (head.top < 0 || head.top >= 400 || head.left < 0 || head.left >= 400) {
+                clearInterval(interval);
+                alert("Game Over!");
+            }
+
+            for (var i = 1; i < snake.length; i++) {
+                if (head.top === snake[i].top && head.left === snake[i].left) {
+                    clearInterval(interval);
+                    alert("Game Over!");
+                }
+            }
+
+            if (head.top === food.top && head.left === food.left) {
+                snake.push({});
+                generateFood();
+            }
+        }
+
+        function generateFood() {
+            var randomTop = Math.floor(Math.random() * 20) * 20;
+            var randomLeft = Math.floor(Math.random() * 20) * 20;
+
+            for (var i = 0; i < snake.length; i++) {
+                if (randomTop === snake[i].top && randomLeft === snake[i].left) {
+                    generateFood();
+                    return;
+                }
+            }
+
+            food = { top: randomTop, left: randomLeft };
+            var foodElement = document.getElementsByClassName("food")[0];
+            foodElement.style.top = food.top + "px";
+            foodElement.style.left = food.left + "px";
+        }
+
+        function changeDirection(event) {
+            if (event.keyCode === 37 && direction !== "right") {
+                direction = "left";
+            } else if (event.keyCode === 38 && direction !== "down") {
+                direction = "up";
+            } else if (event.keyCode === 39 && direction !== "left") {
+                direction = "right";
+            } else if (event.keyCode === 40 && direction !== "up") {
+                direction = "down";
+            }
+        }
+
+        function handleTouch(event) {
+            var x = event.touches[0].clientX;
+            var y = event.touches[0].clientY;
+
+            var gameBoardRect = gameBoard.getBoundingClientRect();
+            var gameBoardX = gameBoardRect.left;
+            var gameBoardY = gameBoardRect.top;
+
+            var relativeX = x - gameBoardX;
+            var relativeY = y - gameBoardY;
+
+            if (relativeX > relativeY && direction !== "down") {
+                direction = "up";
+            } else if (relativeX < relativeY && direction !== "up") {
+                direction = "down";
+            } else if (relativeX < relativeY && direction !== "right") {
+                direction = "left";
+            } else if (relativeX > relativeY && direction !== "left") {
+                direction = "right";
+            }
+        }
+
+        function startGame() {
+            createSnake();
+            createFood();
+            interval = setInterval(function () {
+                moveSnake();
+                checkCollision();
+            }, 200);
+            document.addEventListener("keydown", changeDirection);
+            gameBoard.addEventListener("touchstart", handleTouch);
+
+            var upButton = document.getElementById("up-button");
+            var downButton = document.getElementById("down-button");
+            var leftButton = document.getElementById("left-button");
+            var rightButton = document.getElementById("right-button");
+
+            upButton.addEventListener("touchstart", function () {
+                direction = "up";
+            });
+
+            downButton.addEventListener("touchstart", function () {
+                direction = "down";
+            });
+
+            leftButton.addEventListener("touchstart", function () {
+                direction = "left";
+            });
+
+            rightButton.addEventListener("touchstart", function () {
+                direction = "right";
+            });
+        }
+
+        startGame();
+    </script>
+</body>
+</html>
